@@ -224,3 +224,85 @@ with tabs[11]:
     st.write("**Bitcoin (BTC)** : La première et la plus célèbre des cryptomonnaies.")
     st.write("**Ethereum (ETH)** : Utilisé pour des applications décentralisées.")
     st.write("**Litecoin (LTC)** : Une alternative plus rapide au Bitcoin.")
+    # ========== 🔧 Fonctions utilitaires ==========
+
+def evaluer_profil(age, risque, connaissance):
+    score = 0
+    if age < 35:
+        score += 1
+    if risque == "Élevée":
+        score += 2
+    elif risque == "Modérée":
+        score += 1
+    if connaissance == "Avancé":
+        score += 2
+    elif connaissance == "Intermédiaire":
+        score += 1
+    return score
+
+# ========== 🔄 Mise à jour du Simulateur de Rendement avec Altair ==========
+import altair as alt
+
+if "📈 Simulateur de Rendement" in [tab.label for tab in tabs]:
+    with tabs[2]:
+        st.subheader("📊 Graphique interactif")
+        df = pd.DataFrame({
+            "Année": list(range(1, duree+1)),
+            "Capital estimé ($)": historique
+        })
+        chart = alt.Chart(df).mark_line(point=True).encode(
+            x='Année:O',
+            y='Capital estimé ($):Q',
+            tooltip=['Année', 'Capital estimé ($)']
+        ).interactive()
+        st.altair_chart(chart, use_container_width=True)
+
+# ========== 🧮 Calculateur Retraite ==========
+
+tabs.append(st.tab("🧓 Planification Retraite"))
+with tabs[-1]:
+    st.header("🧓 Planification Retraite")
+    age_retraite = st.slider("À quel âge voulez-vous prendre votre retraite ?", 55, 70, 65)
+    revenus_voulus = st.number_input("Revenu annuel désiré à la retraite ($)", value=40000)
+    duree_retraite = 90 - age_retraite
+    inflation = st.slider("Inflation estimée (%)", 1, 5, 2)
+
+    besoin_total = 0
+    for i in range(duree_retraite):
+        besoin_total += revenus_voulus * ((1 + inflation/100) ** i)
+
+    st.success(f"📊 Vous aurez besoin d’environ **{besoin_total:,.0f} $** pour {duree_retraite} ans de retraite.")
+
+# ========== 🧠 Quiz amélioré aléatoire ==========
+if "🧠 Quiz Financier" in [tab.label for tab in tabs]:
+    with tabs[10]:
+        st.header("🧠 Quiz Financier Amélioré")
+        import random
+        questions = [
+            {"q": "Quel est l'objectif principal de la diversification ?", "r": "Minimiser les risques", "opts": ["Maximiser les rendements", "Minimiser les risques", "Augmenter les frais"]},
+            {"q": "Que signifie ETF ?", "r": "Fonds négocié en bourse", "opts": ["Frais de trading", "Fonds négocié en bourse", "Épargne temporaire fixe"]},
+            {"q": "C'est quoi un dividende ?", "r": "Une part des bénéfices reversée aux actionnaires", "opts": ["Une taxe", "Un prêt", "Une part des bénéfices reversée aux actionnaires"]}
+        ]
+        q = random.choice(questions)
+        st.subheader(f"❓ {q['q']}")
+        rep = st.radio("Votre réponse :", q["opts"])
+        if rep:
+            if rep == q["r"]:
+                st.success("Bonne réponse ✅")
+            else:
+                st.error(f"Mauvaise réponse ❌. Bonne réponse : **{q['r']}**")
+
+# ========== 🎯 Score Profil Investisseur ==========
+
+if "📋 Profil Financier" in [tab.label for tab in tabs]:
+    with tabs[0]:
+        if submitted:
+            score = evaluer_profil(age, risque, connaissance)
+            st.markdown(f"### 🎯 **Score investisseur : {score}/5**")
+            if score <= 2:
+                st.warning("Profil prudent : idéal pour obligations ou fonds équilibrés.")
+            elif score <= 4:
+                st.info("Profil modéré : bon équilibre entre actions et obligations.")
+            else:
+                st.success("Profil dynamique : vous pouvez viser des rendements plus élevés.")
+
